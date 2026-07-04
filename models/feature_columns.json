@@ -1,0 +1,21 @@
+[
+  "domain_length",
+  "has_hyphen",
+  "url_shortener",
+  "suspicious_words",
+  "domain_age_category",
+  "dns_record",
+  "iframe",
+  "popup_window",
+  "onmouseover",
+  "num_forms",
+  "external_scripts",
+  "external_images",
+  "hidden_elements",
+  "internal_links",
+  "external_links",
+  "null_links",
+  "external_ratio",
+  "script_length",
+  "domain_entropy"
+]
