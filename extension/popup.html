@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhiUSIIL Phishing Detector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <span class="shield-icon">🛡️</span>
+      <span class="title">PhiUSIIL Detector</span>
+    </div>
+    <span class="badge-api" id="apiStatus">API Online</span>
+  </div>
+
+  <div class="container">
+    <div class="input-section">
+      <label for="urlInput">Target URL:</label>
+      <div class="input-group">
+        <input type="text" id="urlInput" placeholder="https://example.com" />
+      </div>
+      <button id="scanBtn" class="btn-primary">🔍 Scan Current Tab</button>
+    </div>
+
+    <!-- Spinner Loading State -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p id="loadingMsg">Analyzing features with ensemble ML...</p>
+    </div>
+
+    <!-- Results Display -->
+    <div id="results" class="results hidden">
+      <div id="verdictBanner" class="verdict-banner"></div>
+
+      <div class="confidence-box">
+        <div class="confidence-header">
+          <span>Phishing Probability:</span>
+          <strong id="confidenceVal">0%</strong>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progressBar" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="models-breakdown">
+        <h3>🤖 Per-Model Ensemble Votes</h3>
+        <div id="modelsList" class="models-list"></div>
+      </div>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="errorMsg" class="error-banner hidden"></div>
+  </div>
+
+  <div class="footer">
+    <span>PhiUSIIL Dataset · 5 Models Ensemble</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

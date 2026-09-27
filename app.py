@@ -27,6 +27,7 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
 # INJECT CUSTOM CSS
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -37,17 +38,39 @@ html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
 }
 
-/* Dark gradient background */
+/* Main App Dark Gradient Background */
 .stApp {
     background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
     color: #e0e0f0;
 }
 
-/* Sidebar */
+/* ─────────────────────────────────────────────────────────────────────────────
+   LEFT SIDEBAR ONLY — BRIGHT WHITE TEXT
+   ───────────────────────────────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(12px);
-    border-right: 1px solid rgba(255,255,255,0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-testid="stSidebar"] *,
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] h4,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] span,
+[data-testid="stSidebar"] [data-testid="stRadio"] label,
+[data-testid="stSidebar"] [data-testid="stRadio"] p,
+[data-testid="stSidebar"] [data-testid="stRadio"] div,
+[data-testid="stSidebar"] div[role="radiogroup"] p,
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    color: #ffffff !important;
+    opacity: 1 !important;
 }
 
 /* Cards */
@@ -131,6 +154,8 @@ label, .stTextInput label { color: #c0c0e0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # LOAD MODEL
 # ─────────────────────────────────────────────────────────────────────────────
@@ -188,8 +213,9 @@ def render_verdict(result, show_url=None):
     else:
         st.markdown(f'<div class="verdict-legit">✅ LEGITIMATE</div>', unsafe_allow_html=True)
 
-    st.markdown(f"**Confidence (phishing prob):** `{result['confidence']:.1%}`")
-    st.progress(result["confidence"])
+    conf = float(min(max(result["confidence"], 0.0), 1.0))
+    st.markdown(f"**Confidence (phishing prob):** `{conf:.1%}`")
+    st.progress(conf)
 
     st.markdown("### 🤖 Per-Model Predictions")
     for mname, mres in result["per_model"].items():
@@ -212,17 +238,18 @@ if input_mode == "🔗 Enter URL":
     st.markdown("### 🔗 Enter a URL to Check")
     st.markdown("Paste any URL below — features will be automatically extracted from the live page.")
 
-    url_input = st.text_input(
-        "URL",
-        placeholder="https://example.com/login",
-        label_visibility="collapsed"
-    )
+    with st.form("url_form", clear_on_submit=False):
+        url_input = st.text_input(
+            "URL",
+            placeholder="https://example.com/login",
+            label_visibility="collapsed"
+        )
 
-    col_detect, col_info = st.columns([1, 2])
-    with col_detect:
-        detect_btn = st.button("🔍 Detect Phishing", use_container_width=True, type="primary")
-    with col_info:
-        st.caption("⏱️ Takes 5-15 seconds (fetches the page & extracts 19 features)")
+        col_detect, col_info = st.columns([1, 2])
+        with col_detect:
+            detect_btn = st.form_submit_button("🔍 Detect Phishing", use_container_width=True, type="primary")
+        with col_info:
+            st.caption("⏱️ Takes 3-10 seconds (fetches the page & extracts 19 features)")
 
     if detect_btn:
         if not url_input or not url_input.strip():
@@ -255,26 +282,42 @@ if input_mode == "🔗 Enter URL":
 # ── MODE: JSON / CSV ──────────────────────────────────────────────────────────
 elif input_mode == "📥 JSON / CSV Row":
     st.markdown("### 📥 Paste Feature Values (JSON or CSV Row)")
-    st.markdown("Paste a raw dictionary of feature values, or a single CSV row (with header).")
+    st.markdown("Paste a raw dictionary of feature values in JSON, or a single CSV row (with header).")
 
     sample = {c: 0 for c in feature_cols}
     sample_str = json.dumps(sample, indent=2)
 
-    json_input = st.text_area("Feature JSON", value=sample_str, height=300)
+    json_input = st.text_area("Feature Data (JSON or CSV)", value=sample_str, height=280)
 
     url_hint = st.text_input("URL (for display only, not used in prediction)", placeholder="https://example.com/page")
 
     if st.button("🔍 Detect", use_container_width=True, type="primary"):
+        feature_dict = None
+        # Try JSON
         try:
             feature_dict = json.loads(json_input)
-        except json.JSONDecodeError as e:
-            st.error(f"Invalid JSON: {e}")
+        except Exception:
+            pass
+
+        # Try CSV if JSON failed
+        if feature_dict is None:
+            import io
+            try:
+                df_csv = pd.read_csv(io.StringIO(json_input))
+                if len(df_csv) > 0:
+                    feature_dict = df_csv.iloc[0].to_dict()
+            except Exception:
+                pass
+
+        if not feature_dict or not isinstance(feature_dict, dict):
+            st.error("Invalid input format. Please provide valid JSON dictionary or CSV string with headers.")
             st.stop()
 
         with st.spinner("Running ensemble prediction…"):
             result = predictor.predict(feature_dict)
 
         render_verdict(result, show_url=url_hint if url_hint else None)
+
 
 # ── MODE: Manual Sliders ─────────────────────────────────────────────────────
 else:

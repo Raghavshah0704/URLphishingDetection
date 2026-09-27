@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  width: 360px;
+  background: linear-gradient(135deg, #0f0c29, #221e4a, #1b173c);
+  color: #ffffff;
+  padding: 16px;
+  font-size: 14px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 14px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shield-icon {
+  font-size: 1.2rem;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.badge-api {
+  font-size: 0.7rem;
+  background: rgba(56, 239, 125, 0.2);
+  color: #38ef7d;
+  border: 1px solid rgba(56, 239, 125, 0.4);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.badge-api.offline {
+  background: rgba(255, 65, 108, 0.2);
+  color: #ff416c;
+  border-color: rgba(255, 65, 108, 0.4);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.input-section label {
+  display: block;
+  font-size: 0.8rem;
+  color: #c0c0e0;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  outline: none;
+}
+.input-group input:focus {
+  border-color: #38ef7d;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 11px;
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+  color: #0f0c29;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.2s ease;
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.loading {
+  text-align: center;
+  padding: 16px 0;
+}
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #38ef7d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 10px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.verdict-banner {
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.verdict-banner.phishing {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 65, 108, 0.4);
+}
+.verdict-banner.legit {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+  color: #0f0c29;
+  box-shadow: 0 0 20px rgba(56, 239, 125, 0.3);
+}
+
+.confidence-box {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+}
+.confidence-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #11998e, #38ef7d);
+  transition: width 0.4s ease;
+}
+
+.models-breakdown h3 {
+  font-size: 0.85rem;
+  color: #e0e0ff;
+  margin: 12px 0 8px;
+}
+.model-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.8rem;
+}
+.model-name {
+  color: #c0c0e0;
+}
+.badge-vote {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.badge-vote.phish {
+  background: #ff416c;
+  color: #ffffff;
+}
+.badge-vote.legit {
+  background: #38ef7d;
+  color: #0f0c29;
+}
+
+.error-banner {
+  background: rgba(255, 65, 108, 0.15);
+  border: 1px solid rgba(255, 65, 108, 0.4);
+  color: #ff416c;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.footer {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  font-size: 0.7rem;
+  color: #8080a0;
+}
+
+.hidden {
+  display: none !important;
+}

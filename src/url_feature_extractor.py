@@ -22,8 +22,10 @@ import numpy as np
 import requests
 import tldextract
 from bs4 import BeautifulSoup
+import urllib3
 
 warnings.filterwarnings("ignore")
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # HTTP SESSION

@@ -159,7 +159,7 @@ models = {
     },
     "logistic_regression": {
         "model": LogisticRegression(
-            max_iter=1000, C=0.5, solver="lbfgs", n_jobs=-1,
+            max_iter=1000, C=0.5, solver="lbfgs",
             random_state=RANDOM_STATE
         ),
         "scaled": True,

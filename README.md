@@ -65,6 +65,11 @@ This will:
 ```bash
 streamlit run app.py
 ```
+Or:
+```bash
+python -m streamlit run app.py
+```
+
 
 ---
 
