@@ -1,131 +1,190 @@
-# PhiUSIIL Phishing URL Detector
+# 🛡️ PhiUSIIL Phishing URL Detector
 
-A complete phishing URL detection project trained from scratch on the
-**PhiUSIIL_Phishing_URL_Dataset** — 235,795 labeled URLs with 53 pre-extracted
-features (URL-structure + HTML/content-based).
+A complete, end-to-end Machine Learning phishing URL detection system trained on the **PhiUSIIL Phishing URL Dataset**. The project features real-time URL & content feature extraction, a 5-model ensemble classifier, an interactive Streamlit Web Dashboard, a Flask REST API backend, and a Google Chrome Browser Extension (Manifest V3).
+
+---
+
+## ✨ Features
+
+- **🤖 5 ML Models Ensemble:** Combines Random Forest, Extra Trees, Gradient Boosting, Logistic Regression, and K-Nearest Neighbors (KNN) with soft-voting / majority consensus.
+- **⚡ Real-Time Feature Extraction:** Automatically scrapes and extracts 19 high-impact URL structural and HTML content features live from target websites.
+- **📊 Interactive Streamlit Web Dashboard:** Test URLs in real time, view detailed model predictions, breakdown features, inspect HTML elements, or manually adjust feature sliders.
+- **🔌 Flask REST API Server:** Provides a high-performance REST endpoint (`/api/predict`) with CORS enabled for seamless integration.
+- **🧩 Browser Extension:** Chrome/Edge Manifest V3 extension for instant 1-click phishing checks while browsing.
+- **🚀 One-Click Launchers:** Windows Batch (`.bat`) and PowerShell (`.ps1`) launcher scripts for quick startup.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-PhishDetect_PhiUSIIL/
-├── train.py                # Train all 5 ML models on the dataset
-├── app.py                  # Streamlit web UI for interactive detection
-├── requirements.txt        # Python dependencies
-├── models/                 # Saved model artifacts (auto-created after training)
+phishing-detection/
+├── train.py                  # Model training script & performance evaluation
+├── app.py                    # Streamlit interactive web dashboard
+├── api.py                    # Flask REST API server for external/extension requests
+├── requirements.txt          # Python project dependencies
+├── training_results.json     # Saved metrics summary (Accuracy, F1, AUC-ROC)
+├── run.bat                   # 1-Click launcher for Streamlit Dashboard (Cmd)
+├── run.ps1                   # 1-Click launcher for Streamlit Dashboard (PowerShell)
+├── run_api.bat               # 1-Click launcher for REST API Server (Cmd)
+├── run_api.ps1               # 1-Click launcher for REST API Server (PowerShell)
+├── dataset/                  # Dataset directory
+│   └── feature_dataset_clean.csv # Preprocessed PhiUSIIL dataset (20,174 rows)
+├── models/                   # Saved ML model artifacts & preprocessors
+│   ├── feature_columns.json
 │   ├── imputer.pkl
 │   ├── scaler.pkl
-│   ├── feature_columns.json
 │   ├── random_forest.pkl
 │   ├── extra_trees.pkl
 │   ├── gradient_boosting.pkl
 │   ├── logistic_regression.pkl
 │   └── knn.pkl
+├── extension/                # Chrome Browser Extension (Manifest V3)
+│   ├── manifest.json
+│   ├── popup.html
+│   ├── popup.css
+│   ├── popup.js
+│   └── icons/
 └── src/
     ├── __init__.py
-    └── predictor.py        # PhishingPredictor class (ensemble inference)
+    ├── predictor.py          # PhishingPredictor inference engine
+    └── url_feature_extractor.py # Live URL & HTML feature extraction pipeline
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Installation
 
-All required packages come from the existing venv in ProjectII:
-```bash
-# Already installed in the parent project venv — just activate it:
-..\\.venv\\Scripts\\activate
-```
-
-Or install fresh:
+Clone or open the repository and install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Train the Models
+### 2. Train Models (Optional)
 
+Pre-trained models are already saved in the `models/` directory. To retrain all 5 classifiers:
 ```bash
-cd PhishDetect_PhiUSIIL
 python train.py
 ```
+*Trains Random Forest, Extra Trees, Gradient Boosting, Logistic Regression, and KNN, saving performance statistics to `training_results.json`.*
 
-This will:
-- Load `../dataset/PhiUSIIL_Phishing_URL_Dataset.csv`
-- Train 5 ML models (RF, ExtraTrees, GradBoost, LogReg, KNN)
-- Save all models to `models/`
-- Print accuracy, F1, and AUC-ROC for each model
-- Save a JSON results summary to `training_results.json`
+---
 
-**Expected training time:** ~5–20 minutes (depends on hardware)
+## 🖥️ Running the Applications
 
-### 3. Run the Web App
+### Option A: Streamlit Web Dashboard
 
+**Command Line:**
 ```bash
 streamlit run app.py
 ```
-Or:
+
+**Windows Quick Launch:**
+- Double-click `run.bat` or execute `.\run.ps1` in PowerShell.
+
+*Access the dashboard in your web browser at `http://localhost:8501`.*
+
+---
+
+### Option B: Flask REST API Server
+
+**Command Line:**
 ```bash
-python -m streamlit run app.py
+python api.py
 ```
 
+**Windows Quick Launch:**
+- Double-click `run_api.bat` or execute `.\run_api.ps1` in PowerShell.
+
+*The API server will run on `http://localhost:5000`.*
 
 ---
 
-## 📊 Dataset Details
+### Option C: Chrome Browser Extension
 
-| Property | Value |
+1. Start the Flask REST API server (`python api.py` or run `run_api.bat`).
+2. Open Google Chrome (or Microsoft Edge) and navigate to `chrome://extensions/`.
+3. Enable **Developer mode** in the top-right corner.
+4. Click **Load unpacked** and select the `extension/` directory.
+5. Click the extension icon in your browser toolbar to analyze any active tab or entered URL!
+
+---
+
+## 📊 Dataset & Feature Extraction
+
+The dataset consists of **20,174 balanced URLs** (10,087 phishing / 10,087 legitimate). High-correlation data leakage columns and zero-variance features were dropped to ensure realistic, highly generalizable model performance.
+
+### 19 Extracted Feature Breakdown
+
+| Feature Category | Features |
 |---|---|
-| File | `feature_dataset_clean.csv` |
-| Total rows | 20,174 |
-| Phishing (1) | 10,087 |
-| Legitimate (0) | 10,087 |
-| Feature columns | 19 (leaky and zero-variance features dropped) |
-
-### Feature Groups (19 Features)
-
-**URL-based (7 features)**  
-domain_length, has_hyphen, url_shortener, suspicious_words, domain_age_category, dns_record, domain_entropy
-
-**HTML/Content-based (12 features)**  
-iframe, popup_window, onmouseover, num_forms, external_scripts, external_images, hidden_elements, internal_links, external_links, null_links, external_ratio, script_length
+| **URL Structural (7)** | `domain_length`, `has_hyphen`, `url_shortener`, `suspicious_words`, `domain_age_category`, `dns_record`, `domain_entropy` |
+| **HTML & Content (12)** | `iframe`, `popup_window`, `onmouseover`, `num_forms`, `external_scripts`, `external_images`, `hidden_elements`, `internal_links`, `external_links`, `null_links`, `external_ratio`, `script_length` |
 
 ---
 
-## 🤖 Models
+## 📈 Model Performance Benchmark
 
-| Model | Notes |
-|---|---|
-| **Random Forest** | 200 trees, max depth 12, min samples leaf 4 |
-| **Extra Trees** | 200 trees, max depth 12, min samples leaf 4 |
-| **Gradient Boosting** | 150 estimators, learning rate 0.08, max depth 5 |
-| **Logistic Regression** | Linear baseline, trained on scaled features |
-| **KNN (k=9)** | Instance-based, trained on scaled features |
+Models were trained and evaluated on a held-out 20% test split:
 
-**Ensemble strategy:** Majority vote over predicted labels; mean probability for confidence score.
+| Model | Accuracy | F1 Score | AUC-ROC | Train Time |
+|---|:---:|:---:|:---:|:---:|
+| 🥇 **Gradient Boosting** | **86.69%** | **0.8300** | **0.9356** | ~2.89s |
+| 🥈 **Random Forest** | **85.97%** | **0.8195** | **0.9269** | ~0.49s |
+| 🥉 **KNN (k=9)** | **84.56%** | **0.8078** | **0.9123** | < 0.01s |
+| 🏅 **Extra Trees** | **82.87%** | **0.7898** | **0.9037** | ~0.30s |
+| 🎖️ **Logistic Regression** | **75.02%** | **0.6870** | **0.8332** | ~0.08s |
 
----
-
-## 🖥️ Web App Modes
-
-| Mode | Description |
-|---|---|
-| **🔗 Enter URL** | Enter a URL to automatically fetch its page and extract the 19 features in real-time |
-| **📥 JSON / CSV Row** | Paste a pre-extracted JSON dict of the 19 features |
-| **🎛️ Manual Sliders** | Interactively adjust the 19 feature values with sliders/inputs |
+*Ensemble decision is computed via majority voting across models with confidence calculated from mean probability scores.*
 
 ---
 
-## 📈 Expected Performance (on held-out 20% test set)
+## 📡 REST API Reference
 
-To prevent data leakage, 9 high-correlation leakage columns (like `domain_age`, `num_dots`, `has_ip`, etc.) and 8 zero-variance columns were dropped. This yields a highly robust, generalizable model:
+### Health Check
+`GET /`
+```json
+{
+  "service": "PhiUSIIL Phishing URL Detector API",
+  "status": "online",
+  "version": "1.0.0"
+}
+```
 
-| Model | Accuracy | F1 | AUC-ROC |
-|---|---|---|---|
-| **Gradient Boosting** | 86.69% | 0.8300 | 0.9356 |
-| **Random Forest** | 85.97% | 0.8195 | 0.9269 |
-| **KNN (k=9)** | 84.58% | 0.8080 | 0.9126 |
-| **Extra Trees** | 82.87% | 0.7898 | 0.9037 |
-| **Logistic Regression** | 75.02% | 0.6870 | 0.8332 |
+### Predict Phishing Probability
+`POST /api/predict` or `GET /api/predict?url=https://example.com`
 
+**Request Body (JSON):**
+```json
+{
+  "url": "https://example.com"
+}
+```
+
+**Response (JSON):**
+```json
+{
+  "url": "https://example.com",
+  "prediction": "Legitimate",
+  "confidence": 0.945,
+  "ensemble_votes": {
+    "Legitimate": 5,
+    "Phishing": 0
+  },
+  "per_model": {
+    "random_forest": {"label": "Legitimate", "prob": 0.96},
+    "gradient_boosting": {"label": "Legitimate", "prob": 0.98},
+    "knn": {"label": "Legitimate", "prob": 0.92},
+    "extra_trees": {"label": "Legitimate", "prob": 0.93},
+    "logistic_regression": {"label": "Legitimate", "prob": 0.93}
+  }
+}
+```
+
+---
+
+## 🛡️ License & Acknowledgments
+
+Trained on the **PhiUSIIL Phishing URL Dataset** provided by security researchers. Built with Python, Scikit-Learn, Streamlit, Flask, and BeautifulSoup4.
